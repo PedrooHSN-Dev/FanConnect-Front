@@ -50,9 +50,13 @@ export class Feed implements OnInit {
   }
 
   carregarLembretes() {
-    this.http.get<any[]>(`${this.apiUrl}/agenda/global`).subscribe({
+    this.http.get<any[]>(`${this.apiUrl}/agenda/meus-eventos`).subscribe({
       next: (res) => {
-        this.lembretes = res;
+        const hoje = new Date();
+        this.lembretes = res
+          .filter(e => new Date(e.dataHora) >= hoje)
+          .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
+          .slice(0, 5);
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Erro ao buscar lembretes', err)

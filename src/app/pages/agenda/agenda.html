@@ -1,0 +1,159 @@
+<div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 min-h-[80vh] flex flex-col overflow-hidden">
+
+  <div class="border-b border-gray-100 px-8 py-4 flex justify-between items-center">
+    <div class="flex gap-4">
+      <button (click)="mudarMes(-1)" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 class="text-xl font-black text-[#1c2e7a] min-w-[150px] text-center">
+        {{ meses[dataReferencia.getMonth()] }} {{ dataReferencia.getFullYear() }}
+      </h2>
+      <button (click)="mudarMes(1)" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <button (click)="modoFormulario = true; eventoSelecionado = null" class="bg-[#2861d6] hover:bg-[#1c2e7a] text-white font-bold py-2 px-6 rounded-xl transition-all shadow-md flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+      Novo Evento
+    </button>
+  </div>
+
+  <div class="flex-1 grid grid-cols-1 md:grid-cols-3 divide-gray-100 md:divide-x">
+
+    <!-- CALENDÁRIO -->
+    <div class="p-8">
+      <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">
+        <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+      </div>
+      <div class="grid grid-cols-7 text-center gap-y-4">
+        <div *ngFor="let item of diasNoCalendario" class="relative py-2">
+          <span *ngIf="item.dia"
+                [class.bg-[#2861d6]]="item.possuiEvento"
+                [class.text-white]="item.possuiEvento"
+                [class.shadow-lg]="item.possuiEvento"
+                class="w-9 h-9 mx-auto rounded-full flex items-center justify-center text-sm font-bold transition-all">
+            {{ item.dia }}
+          </span>
+          <div *ngIf="item.possuiEvento" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#ff7315] rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="mt-12 p-4 bg-gray-50 rounded-2xl space-y-3">
+        <p class="text-xs font-bold text-gray-400 uppercase">Legenda</p>
+        <div class="flex items-center gap-2 text-xs font-semibold text-gray-600">
+          <div class="w-3 h-3 rounded-full bg-[#2861d6]"></div> Dias com compromissos
+        </div>
+      </div>
+    </div>
+
+    <!-- LINHA DO TEMPO -->
+    <div class="p-8 bg-gray-50/30">
+      <h3 class="font-extrabold text-xl text-gray-900 mb-6">Linha do Tempo</h3>
+      <div class="space-y-4 overflow-y-auto max-h-[550px] pr-2">
+        <div *ngFor="let e of eventos" (click)="selecionarEvento(e)" class="bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2861d6] cursor-pointer transition-all">
+          <div class="flex justify-between items-start">
+            <span [ngClass]="getCorCategoria(e.categoria)" class="px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase">{{ e.categoria }}</span>
+            <span class="text-[10px] font-bold text-gray-400">{{ formatarData(e.dataHora) }}</span>
+          </div>
+          <h4 class="font-bold text-gray-800 mt-2">{{ e.titulo }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL DIREITO -->
+    <div class="p-8">
+
+      <!-- FORMULÁRIO -->
+      <div *ngIf="modoFormulario">
+        <h3 class="font-extrabold text-xl text-[#ff7315] mb-6">
+          {{ novoEvento.id ? 'Editar Evento' : 'Novo Compromisso' }}
+        </h3>
+        <form (ngSubmit)="salvarEvento()" class="space-y-4">
+
+          <input type="text" [(ngModel)]="novoEvento.titulo" name="titulo" placeholder="Título"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none">
+
+          <textarea [(ngModel)]="novoEvento.descricao" name="descricao" placeholder="Descrição" rows="3"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none resize-none"></textarea>
+
+          <input type="text" [(ngModel)]="novoEvento.localizacao" name="localizacao" placeholder="Localização"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none">
+
+          <div class="grid grid-cols-2 gap-4">
+            <select [(ngModel)]="novoEvento.categoria" name="categoria"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none">
+              <option value="ACADEMICO">Académico</option>
+              <option value="FESTA">Festa</option>
+              <option value="EVENTOS">Eventos</option>
+            </select>
+
+            <select [(ngModel)]="novoEvento.visibilidade" name="visibilidade"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none">
+              <option value="PRIVADO">Privado</option>
+              <option value="TURMA">Turma</option>
+              <option value="GLOBAL">Global</option>
+            </select>
+          </div>
+
+          <label class="flex items-center gap-2 text-sm font-bold text-gray-600">
+            <input type="checkbox" [(ngModel)]="novoEvento.lembreteAtivo" name="lembrete"> Lembrete Ativo
+          </label>
+
+          <div *ngIf="novoEvento.lembreteAtivo" class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+            <label class="text-xs font-bold text-blue-800">Avisar quantos minutos antes?</label>
+            <input type="number" [(ngModel)]="novoEvento.minutosAvisoLembrete" name="minutos"
+              class="w-full mt-1 bg-white border border-blue-200 rounded-lg p-2 outline-none">
+          </div>
+
+          <input type="datetime-local" [(ngModel)]="novoEvento.dataHora" name="data"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3">
+
+          <button type="submit" class="w-full bg-[#ff7315] text-white font-bold py-3 rounded-xl shadow-md hover:bg-[#e0610d]">
+            {{ novoEvento.id ? 'Salvar Alterações' : 'Criar Evento' }}
+          </button>
+          <button type="button" (click)="modoFormulario = false" class="w-full text-gray-400 font-bold py-2">Cancelar</button>
+        </form>
+      </div>
+
+      <!-- DETALHE DO EVENTO (bloco único, sem duplicata) -->
+      <div *ngIf="eventoSelecionado && !modoFormulario">
+        <h2 class="text-2xl font-black text-[#1c2e7a] mb-6">{{ eventoSelecionado.titulo }}</h2>
+
+        <div class="space-y-4 text-sm">
+          <div class="p-4 bg-gray-50 rounded-xl">
+            <p class="text-gray-400 font-bold uppercase text-[10px] mb-1">Descrição</p>
+            <p class="text-gray-700 leading-relaxed">{{ eventoSelecionado.descricao || 'Sem descrição.' }}</p>
+          </div>
+
+          <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+            <p class="text-blue-800 font-bold mb-1 uppercase text-[10px]">Localização</p>
+            <p class="text-blue-600">{{ eventoSelecionado.localizacao || 'Não definida' }}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-3 bg-gray-50 rounded-xl">
+              <p class="text-gray-400 font-bold uppercase text-[10px] mb-1">Categoria</p>
+              <p class="text-gray-700 font-semibold">{{ eventoSelecionado.categoria }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-xl">
+              <p class="text-gray-400 font-bold uppercase text-[10px] mb-1">Visibilidade</p>
+              <p class="text-gray-700 font-semibold">{{ eventoSelecionado.visibilidade }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-8">
+          <button (click)="prepararEdicao(eventoSelecionado)" class="bg-gray-200 hover:bg-gray-300 py-2.5 px-4 rounded-lg font-bold text-sm">Editar</button>
+          <button (click)="deletarEvento(eventoSelecionado.id)" class="bg-red-500 hover:bg-red-600 text-white py-2.5 px-4 rounded-lg font-bold text-sm">Deletar</button>
+        </div>
+      </div>
+
+      <!-- ESTADO VAZIO -->
+      <div *ngIf="!eventoSelecionado && !modoFormulario" class="text-center py-20 text-gray-300 italic">
+        Selecione um dia ou evento para ver detalhes
+      </div>
+
+    </div>
+  </div>
+</div>

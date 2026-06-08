@@ -1,0 +1,74 @@
+<div class="min-h-screen w-full flex bg-[#2861d6]">
+  
+  <div class="hidden md:flex flex-1 flex-col items-center justify-center">
+    <img src="logo-fanconnect.png" alt="Logo FanConnect" class="w-[85%] max-w-[660px] h-auto object-contain">
+  </div>
+
+  <div class="flex-1 flex items-center justify-center p-6">
+    <div class="bg-white rounded-[2rem] p-10 w-full max-w-md shadow-2xl">
+      <h2 class="text-4xl font-extrabold text-[#1c2e7a] mb-8">Login</h2>
+
+      <form (ngSubmit)="entrar()">
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">E-mail</label>
+          <div class="flex items-center bg-[#ff7315] rounded-full px-5 py-3.5">
+            <svg class="w-5 h-5 text-black/70 mr-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path>
+            </svg>
+            <input type="email" name="email" [(ngModel)]="email" placeholder="exemplo@email.com" class="bg-transparent w-full outline-none text-black placeholder-black/60 font-medium">
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Senha</label>
+          <div class="flex items-center bg-[#ff7315] rounded-full px-5 py-3.5">
+            <svg class="w-5 h-5 text-black/70 mr-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
+            </svg>
+            <input [type]="mostrarSenha ? 'text' : 'password'" name="senha" [(ngModel)]="senha" placeholder="Digite sua senha" class="bg-transparent w-full outline-none text-black placeholder-black/60 font-medium">
+            <svg (click)="mostrarSenha = !mostrarSenha" class="w-5 h-5 text-black/70 ml-3 cursor-pointer hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-8">
+          <label class="flex items-center cursor-pointer text-gray-700 text-sm font-medium">
+            <input type="checkbox" name="lembrar" [(ngModel)]="lembrarDispositivo" class="mr-2 w-4 h-4 rounded border-gray-300 text-[#2861d6] focus:ring-[#2861d6]"> Lembrar dispositivo
+          </label>
+          <a (click)="esqueciSenha()" class="text-[#ff7315] text-sm font-bold hover:underline cursor-pointer">Esqueci minha senha</a>
+        </div>
+
+        @if (mensagemErro) {
+          <div class="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-full text-center font-semibold border border-red-200">
+            {{ mensagemErro }}
+          </div>
+        }
+
+        <button type="submit" (click)="entrar()" class="w-full bg-[#ff7315] hover:bg-[#e0610d] text-white rounded-full py-3.5 font-bold text-lg transition-colors flex items-center justify-center gap-2 mb-4 shadow-md">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H8.25"></path>
+          </svg>
+          Entrar
+        </button>
+
+        <button type="button" (click)="entrarComGoogle()" class="w-full flex items-center justify-center gap-3 border border-gray-200 shadow-sm rounded-full py-3.5 hover:bg-gray-50 transition-colors">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" class="w-5 h-5">
+          <span class="text-gray-800 font-bold text-sm">Entrar com Google</span>
+        </button>
+
+        <div class="flex items-center my-6">
+          <div class="flex-grow border-t border-gray-200"></div>
+          <span class="px-4 text-gray-400 text-xs font-medium uppercase">ou</span>
+          <div class="flex-grow border-t border-gray-200"></div>
+        </div>
+
+        <button type="button" (click)="irParaCadastro()" class="w-full bg-[#1c2e7a] hover:bg-[#121f59] text-white rounded-full py-3.5 font-bold text-base transition-colors shadow-md">
+          Criar Conta Nova
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+<div class="min-h-screen w-full flex bg-[#2861d6]">
+  
+  <div class="hidden md:flex flex-1 flex-col items-center justify-center">
+    <img src="logo-fanconnect.png" alt="Logo FanConnect" class="w-[85%] max-w-[600px] h-auto object-contain">
+  </div>
+
+  <div class="flex-1 flex items-center justify-center p-6">
+    <div class="bg-white rounded-[2rem] p-10 w-full max-w-md shadow-2xl">
+      <h2 class="text-4xl font-extrabold text-[#1c2e7a] mb-6">Criar Conta</h2>
+      <p class="text-gray-500 mb-8 font-medium">Junte-se à comunidade FanConnect!</p>
+
+      <form (ngSubmit)="cadastrar()">
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Nome Completo</label>
+          <div class="flex items-center bg-gray-100 rounded-full px-5 py-3">
+            <input type="text" name="nome" [(ngModel)]="nome" placeholder="Seu nome" class="bg-transparent w-full outline-none text-black">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Matrícula</label>
+          <div class="flex items-center bg-gray-100 rounded-full px-5 py-3">
+            <input type="text" name="matricula" [(ngModel)]="matricula" placeholder="Sua matrícula (ex: 20250000001)" class="bg-transparent w-full outline-none text-black">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">E-mail</label>
+          <div class="flex items-center bg-[#ff7315] rounded-full px-5 py-3">
+            <input type="email" name="email" [(ngModel)]="email" placeholder="seu@email.com" class="bg-transparent w-full outline-none text-black placeholder-black/60 font-medium">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Senha</label>
+          <div class="flex items-center bg-[#ff7315] rounded-full px-5 py-3">
+            <input [type]="mostrarSenha ? 'text' : 'password'" name="senha" [(ngModel)]="senha" placeholder="Crie uma senha" class="bg-transparent w-full outline-none text-black placeholder-black/60 font-medium">
+            
+            <svg (click)="mostrarSenha = !mostrarSenha" class="w-5 h-5 text-black/70 ml-3 cursor-pointer hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <label class="block text-sm font-semibold text-gray-800 mb-2">Confirmar Senha</label>
+          <div class="flex items-center bg-[#ff7315] rounded-full px-5 py-3">
+            <input [type]="mostrarConfirmarSenha ? 'text' : 'password'" name="confirmar" [(ngModel)]="confirmarSenha" placeholder="Repita a senha" class="bg-transparent w-full outline-none text-black placeholder-black/60 font-medium">
+            
+            <svg (click)="mostrarConfirmarSenha = !mostrarConfirmarSenha" class="w-5 h-5 text-black/70 ml-3 cursor-pointer hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        @if (mensagemErro) {
+          <div class="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-full text-center font-semibold border border-red-200">
+            {{ mensagemErro }}
+          </div>
+        }
+
+        <button type="submit" (click)='cadastrar()' class="w-full bg-[#1c2e7a] hover:bg-[#121f59] text-white rounded-full py-4 font-bold text-lg transition-colors shadow-md mb-6">
+          Finalizar Cadastro
+        </button>
+
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Já tem uma conta? 
+            <a (click)="irParaLogin()" class="text-[#ff7315] font-bold hover:underline cursor-pointer ml-1">
+              Faça login
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

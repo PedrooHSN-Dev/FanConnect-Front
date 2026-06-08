@@ -8,6 +8,7 @@ import { MainLayout } from './layout/main-layout/main-layout';
 import { Feed } from './pages/feed/feed';
 import { Perfil } from './pages/perfil/perfil';
 import { Agenda } from './pages/agenda/agenda';
+import { AuthCallback } from './pages/auth-callback/auth-callback';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'activate', component: Activate },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'reset-password', component: ResetPassword },
+  { path: 'auth-callback', component: AuthCallback },
 
 
   { 

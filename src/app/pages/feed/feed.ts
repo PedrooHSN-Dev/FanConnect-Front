@@ -20,6 +20,13 @@ export class Feed implements OnInit {
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      window.history.replaceState({}, '', '/feed');
+    }
+    
     this.carregarNomeUsuario();
     this.carregarFeed();
     this.carregarLembretes();

@@ -2,11 +2,12 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './feed.html'
 })
 export class Feed implements OnInit {
@@ -15,9 +16,51 @@ export class Feed implements OnInit {
   postagens: any[] = [];
   lembretes: any[] = [];
   novoConteudo = '';
-  nomeUsuarioLogado: string = 'Carregando...';
+  nomeUsuarioLogado: string = localStorage.getItem('nomeUsuario') || 'Carregando...';
+  novoComentario: { [key: number]: string } = {};
+  novoAnexoUrl: string | null = null;
+  mostrandoFormEvento: boolean = false;
+  novoEvento: any = {
+    titulo: '',
+    descricao: 'Evento proposto pela comunidade.',
+    dataHora: '',
+    localizacao: '',
+    categoria: 'ESTUDOS',
+    visibilidade: 'PUBLICO'
+  };
+  toast: { mensagem: string, tipo: 'sucesso' | 'erro' | 'aviso' } | null = null;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+
+  acionarInputArquivo(fileInput: HTMLInputElement) {
+    fileInput.click();
+  }
+
+  fazerUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('arquivo', file);
+
+      this.http.post<any>(`${this.apiUrl}/upload`, formData).subscribe({
+        next: (res) => {
+          this.novoAnexoUrl = res.url;
+          this.cdr.detectChanges();
+        },
+        error: (err) => this.mostrarToast('Erro ao fazer upload da imagem.', 'erro')
+      });
+    }
+  }
+
+  removerAnexo() {
+    this.novoAnexoUrl = null;
+  }
+
+  toggleFormEvento() {
+    this.mostrandoFormEvento = !this.mostrandoFormEvento;
+    if (!this.mostrandoFormEvento) {
+      this.novoEvento = { titulo: '', descricao: 'Evento proposto pela comunidade.', dataHora: '', localizacao: '', categoria: 'ESTUDOS', visibilidade: 'GLOBAL' };    }
+  }
 
   ngOnInit() {
     const params = new URLSearchParams(window.location.search);
@@ -40,8 +83,7 @@ export class Feed implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        const nomeSalvo = localStorage.getItem('nomeUsuario');
-        this.nomeUsuarioLogado = nomeSalvo || 'Usuário';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -60,10 +102,20 @@ export class Feed implements OnInit {
     this.http.get<any[]>(`${this.apiUrl}/agenda/meus-eventos`).subscribe({
       next: (res) => {
         const hoje = new Date();
-        this.lembretes = res
-          .filter(e => new Date(e.dataHora) >= hoje)
+        hoje.setHours(0, 0, 0, 0);
+        
+        const eventosFuturos = res.filter(e => new Date(e.dataHora) >= hoje);
+        
+        const eventosUnicos = eventosFuturos.filter((evento, index, self) =>
+          index === self.findIndex((t) => (
+            t.titulo === evento.titulo && t.dataHora === evento.dataHora
+          ))
+        );
+
+        this.lembretes = eventosUnicos
           .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
           .slice(0, 5);
+          
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Erro ao buscar lembretes', err)
@@ -71,19 +123,32 @@ export class Feed implements OnInit {
   }
 
   publicarPost() {
-    if (!this.novoConteudo.trim()) return;
+    if (!this.novoConteudo.trim() && !this.novoAnexoUrl) return;
 
-    const novaPostagem = {
+    const novaPostagem: any = {
       conteudo: this.novoConteudo,
-      oficial: false
+      oficial: false,
+      anexoUrl: this.novoAnexoUrl
     };
+
+    if (this.mostrandoFormEvento) {
+      if (!this.novoEvento.titulo || !this.novoEvento.dataHora) {
+        this.mostrarToast('Por favor, preencha o Título e a Data/Hora do evento antes de publicar!', 'aviso');
+        return;
+      }
+      novaPostagem.eventoProposto = this.novoEvento;
+    }
 
     this.http.post(`${this.apiUrl}/feed`, novaPostagem).subscribe({
       next: (res) => {
         this.novoConteudo = '';
+        this.novoAnexoUrl = null;
+        this.mostrandoFormEvento = false;
+        this.novoEvento = { titulo: '', descricao: 'Evento proposto pela comunidade.', dataHora: '', localizacao: '', categoria: 'ESTUDOS', visibilidade: 'GLOBAL' };
+        
         this.carregarFeed();
       },
-      error: (err) => alert('Erro ao publicar postagem.')
+      error: (err) => this.mostrarToast('Erro ao publicar postagem. Verifique se todos os campos estão corretos.', 'erro')
     });
   }
 
@@ -96,13 +161,9 @@ export class Feed implements OnInit {
     });
   }
 
-  formatarNome(nomeCompleto: string): string {
-    if (!nomeCompleto) return 'Meu Usuário';
-    const partes = nomeCompleto.trim().split(' ');
-    if (partes.length >= 2) {
-      return `${partes[0]} ${partes[1]}`;
-    }
-    return partes[0];
+formatarNome(nomeCompleto: string): string {
+    if (!nomeCompleto || nomeCompleto === 'Carregando...') return '...';
+    return nomeCompleto.trim();
   }
 
   gerarAvatar(nomeCompleto: string): string {
@@ -121,5 +182,63 @@ export class Feed implements OnInit {
     if (!dataString) return '';
     const data = new Date(dataString);
     return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  toggleComentarios(post: any) {
+    post.mostrarComentarios = !post.mostrarComentarios;
+    
+    if (post.mostrarComentarios && !post.comentariosCarregados) {
+      this.carregarComentarios(post);
+    }
+  }
+
+  carregarComentarios(post: any) {
+    this.http.get<any[]>(`${this.apiUrl}/feed/${post.id}/comentarios`).subscribe({
+      next: (res) => {
+        post.comentarios = res;
+        post.comentariosCarregados = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao buscar comentários', err)
+    });
+  }
+
+  enviarComentario(post: any) {
+    const conteudo = this.novoComentario[post.id];
+    if (!conteudo || !conteudo.trim()) return;
+
+    this.http.post(`${this.apiUrl}/feed/${post.id}/comentar`, { conteudo: conteudo }, { responseType: 'text' }).subscribe({
+      next: () => {
+        this.novoComentario[post.id] = '';
+        post.quantidadeComentarios++;
+        this.carregarComentarios(post);
+      },
+      error: (err) => this.mostrarToast('Erro ao enviar o comentário.', 'erro')
+    });
+  }
+
+  salvarNaAgenda(post: any) {
+    if (post.eventoSalvoPorMim) return;
+
+    this.http.post(`${this.apiUrl}/feed/${post.id}/salvar-agenda`, {}).subscribe({
+      next: () => {
+        post.eventoSalvoPorMim = true;
+        this.mostrarToast('Evento salvo na sua agenda com sucesso!', 'sucesso');
+        this.carregarLembretes();
+      },
+      error: () => this.mostrarToast('Este evento já está na sua agenda ou ocorreu um erro.', 'aviso')
+    });
+  }
+
+  mostrarToast(mensagem: string, tipo: 'sucesso' | 'erro' | 'aviso' = 'sucesso') {
+    this.toast = { mensagem, tipo };
+    
+    // Faz o toast desaparecer automaticamente após 3.5 segundos
+    setTimeout(() => {
+      this.toast = null;
+      this.cdr.detectChanges();
+    }, 3500);
+    
+    this.cdr.detectChanges();
   }
 }

@@ -15,7 +15,6 @@ export class Perfil implements OnInit {
   meuId: number | null = null;
   apiUrl = 'http://localhost:8080/api/usuarios';
 
-  // O ChangeDetectorRef é injetado aqui:
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {

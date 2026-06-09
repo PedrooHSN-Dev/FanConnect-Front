@@ -14,6 +14,7 @@ export class ForgotPassword {
   mensagemErro = '';
   mensagemSucesso = '';
 
+
   constructor(private authService: Auth, private router: Router) {}
 
   solicitar() {

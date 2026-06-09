@@ -5,25 +5,58 @@
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
       <div class="flex gap-4">
         <img [src]="gerarAvatar(nomeUsuarioLogado)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+        
         <div class="flex-1">
           <span class="font-bold text-gray-800">{{ formatarNome(nomeUsuarioLogado) }}</span>
+          
           <textarea 
             [(ngModel)]="novoConteudo" 
             placeholder="Partilhe novidades, dúvidas ou avisos com a sua turma..." 
-            class="w-full bg-gray-50 rounded-2xl p-4 outline-none resize-none text-gray-700 min-h-[100px] border border-transparent focus:border-[#2861d6]/30 focus:ring-4 focus:ring-[#2861d6]/10 transition-all"
+            class="w-full bg-gray-50 rounded-2xl p-4 outline-none resize-none text-gray-700 min-h-[100px] border border-transparent focus:border-[#2861d6]/30 focus:ring-4 focus:ring-[#2861d6]/10 transition-all mt-2"
           ></textarea>
+
+          <input type="file" #fileInput (change)="fazerUpload($event)" accept="image/*" class="hidden">
+
+          <div *ngIf="novoAnexoUrl" class="mt-3 relative inline-block animate-fade-in">
+            <img [src]="novoAnexoUrl" class="h-32 rounded-xl border border-gray-200 object-cover shadow-sm">
+            <button (click)="removerAnexo()" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors shadow-md" title="Remover imagem">
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <div *ngIf="mostrandoFormEvento" class="mt-3 bg-orange-50/50 p-4 rounded-2xl border border-orange-100 animate-fade-in space-y-3">
+            <h4 class="text-sm font-bold text-[#ff7315] flex items-center gap-2 mb-2">
+               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+               Propor Novo Evento
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input type="text" [(ngModel)]="novoEvento.titulo" placeholder="Título (ex: Grupo de Estudos)" class="w-full bg-white rounded-xl p-2.5 text-sm border border-gray-200 outline-none focus:border-[#ff7315]/50 focus:ring-2 focus:ring-[#ff7315]/20">
+              
+              <input type="datetime-local" [(ngModel)]="novoEvento.dataHora" class="w-full bg-white rounded-xl p-2.5 text-sm border border-gray-200 outline-none focus:border-[#ff7315]/50 focus:ring-2 focus:ring-[#ff7315]/20">
+              
+              <input type="text" [(ngModel)]="novoEvento.localizacao" placeholder="Local (ex: Biblioteca)" class="w-full bg-white rounded-xl p-2.5 text-sm border border-gray-200 outline-none focus:border-[#ff7315]/50 focus:ring-2 focus:ring-[#ff7315]/20">
+              
+              <select [(ngModel)]="novoEvento.categoria" class="w-full bg-white rounded-xl p-2.5 text-sm border border-gray-200 outline-none focus:border-[#ff7315]/50 focus:ring-2 focus:ring-[#ff7315]/20">
+                <option value="ESTUDOS">Estudos</option>
+                <option value="FESTA">Festa/Integração</option>
+                <option value="ESPORTES">Eventos</option>
+                <option value="OUTROS">Outros</option>
+              </select>
+            </div>
+          </div>
           
           <div class="flex items-center justify-between mt-3">
             <div class="flex gap-2">
-              <button class="p-2 text-gray-400 hover:text-[#2861d6] hover:bg-blue-50 rounded-full transition-colors tooltip" title="Anexar Imagem">
+              <button (click)="acionarInputArquivo(fileInput)" class="p-2 text-gray-400 hover:text-[#2861d6] hover:bg-blue-50 rounded-full transition-colors tooltip" title="Anexar Imagem">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </button>
-              <button class="p-2 text-gray-400 hover:text-[#ff7315] hover:bg-orange-50 rounded-full transition-colors" title="Propor Evento na Agenda">
+
+              <button (click)="toggleFormEvento()" class="p-2 transition-colors rounded-full tooltip" [ngClass]="mostrandoFormEvento ? 'text-[#ff7315] bg-orange-50' : 'text-gray-400 hover:text-[#ff7315] hover:bg-orange-50'" title="Propor Evento na Agenda">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </button>
             </div>
             
-            <button (click)="publicarPost()" class="bg-[#1c2e7a] hover:bg-[#121f59] text-white font-bold py-2.5 px-6 rounded-full transition-colors shadow-md">
+            <button (click)="publicarPost()" class="bg-[#1c2e7a] hover:bg-[#121f59] text-white font-bold py-2.5 px-6 rounded-full transition-colors shadow-md" [disabled]="!novoConteudo.trim() && !novoAnexoUrl" [class.opacity-50]="!novoConteudo.trim() && !novoAnexoUrl">
               Publicar
             </button>
           </div>
@@ -31,7 +64,7 @@
       </div>
     </div>
 
-    <div *ngFor="let post of postagens" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+<div *ngFor="let post of postagens" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
       
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
@@ -54,19 +87,58 @@
       </div>
 
       <div class="flex items-center gap-6 mt-4 pt-4 border-t border-gray-50">
-        <button (click)="curtir(post.id)" class="flex items-center gap-2 text-gray-500 hover:text-[#ff7315] font-semibold transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
+        <button (click)="curtir(post.id)" 
+                class="flex items-center gap-2 font-semibold transition-colors hover:text-[#ff7315]"
+                [ngClass]="post.curtidoPorMim ? 'text-[#ff7315]' : 'text-gray-500'">
+          
+          <svg class="w-6 h-6" [attr.fill]="post.curtidoPorMim ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+          </svg>
+          
           {{ post.quantidadeCurtidas }}
         </button>
         
-        <button class="flex items-center gap-2 text-gray-500 hover:text-[#2861d6] font-semibold transition-colors">
+        <button (click)="toggleComentarios(post)" class="flex items-center gap-2 text-gray-500 hover:text-[#2861d6] font-semibold transition-colors" [class.text-[#2861d6]]="post.mostrarComentarios">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
           {{ post.quantidadeComentarios }}
         </button>
 
-        <button class="ml-auto text-gray-400 hover:text-gray-700 transition-colors" title="Salvar evento">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+        <button *ngIf="post.eventoProposto" 
+                (click)="salvarNaAgenda(post)" 
+                [disabled]="post.eventoSalvoPorMim"
+                class="ml-auto transition-colors tooltip flex items-center" 
+                [ngClass]="post.eventoSalvoPorMim ? 'text-[#ff7315] cursor-not-allowed' : 'text-gray-400 hover:text-[#ff7315] cursor-pointer'"
+                title="Salvar evento na minha agenda">
+          
+          <svg class="w-6 h-6" [attr.fill]="post.eventoSalvoPorMim ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+          </svg>
         </button>
+      </div>
+
+      <div *ngIf="post.mostrarComentarios" class="mt-4 pt-4 border-t border-gray-100 animate-fade-in">
+        <div class="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2">
+          <div *ngFor="let comentario of post.comentarios" class="flex gap-3">
+            <img [src]="gerarAvatar(comentario.autorNome || comentario.nomeAutor || comentario.autor?.nome)" class="w-8 h-8 rounded-full border border-gray-200">
+            <div class="bg-gray-50 rounded-2xl rounded-tl-none p-3 flex-1 border border-gray-100">
+              <div class="flex items-baseline gap-2 mb-1">
+                <span class="text-xs font-bold text-gray-900">{{ formatarNome(comentario.autorNome || comentario.nomeAutor || comentario.autor?.nome) }}</span>
+                <span class="text-[10px] text-gray-400">{{ formatarData(comentario.dataCriacao) }}</span>
+              </div>
+              <p class="text-sm text-gray-700">{{ comentario.conteudo }}</p>
+            </div>
+          </div>
+          <div *ngIf="post.comentarios?.length === 0" class="text-center text-xs text-gray-400 italic">
+            Seja o primeiro a comentar!
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <input type="text" [(ngModel)]="novoComentario[post.id]" (keyup.enter)="enviarComentario(post)" placeholder="Escreva um comentário..." class="flex-1 bg-gray-50 border border-gray-200 focus:border-[#2861d6]/50 rounded-full px-4 py-2 text-sm outline-none transition-all">
+          <button (click)="enviarComentario(post)" [disabled]="!novoComentario[post.id]" class="bg-[#2861d6] hover:bg-[#1c2e7a] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-2 rounded-full font-bold text-sm transition-colors shadow-sm">
+            Enviar
+          </button>
+        </div>
       </div>
 
     </div>
@@ -103,11 +175,27 @@
         </div>
       </div>
       
-      <button class="w-full mt-4 py-2 text-sm font-bold text-[#2861d6] hover:bg-blue-50 rounded-xl transition-colors">
+      <button routerLink="/agenda"  class="w-full mt-4 py-2 text-sm font-bold text-[#2861d6] hover:bg-blue-50 rounded-xl transition-colors">
         Ver Calendário Completo
       </button>
     </div>
 
+  </div>
+  <div *ngIf="toast" 
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl font-bold text-white text-sm animate-fade-in transition-all border"
+      [ngClass]="{
+        'bg-[#2861d6] border-[#1c2e7a]': toast.tipo === 'sucesso',
+        'bg-red-500 border-red-700': toast.tipo === 'erro',
+        'bg-[#ff7315] border-[#d85e0d]': toast.tipo === 'aviso'
+      }">
+      
+    <svg *ngIf="toast.tipo === 'sucesso'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+    
+    <svg *ngIf="toast.tipo === 'erro'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+    
+    <svg *ngIf="toast.tipo === 'aviso'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+
+    <span>{{ toast.mensagem }}</span>
   </div>
 
 </div>

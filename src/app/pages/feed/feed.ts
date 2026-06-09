@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { ToastService } from '../../core/services/toast/toast';
 
 @Component({
   selector: 'app-feed',
@@ -30,7 +31,11 @@ export class Feed implements OnInit {
   };
   toast: { mensagem: string, tipo: 'sucesso' | 'erro' | 'aviso' } | null = null;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService,
+  ) {}
 
   acionarInputArquivo(fileInput: HTMLInputElement) {
     fileInput.click();
@@ -47,7 +52,7 @@ export class Feed implements OnInit {
           this.novoAnexoUrl = res.url;
           this.cdr.detectChanges();
         },
-        error: (err) => this.mostrarToast('Erro ao fazer upload da imagem.', 'erro')
+        error: (err) => this.toastService.error('Erro ao fazer upload da imagem.')
       });
     }
   }
@@ -133,7 +138,7 @@ export class Feed implements OnInit {
 
     if (this.mostrandoFormEvento) {
       if (!this.novoEvento.titulo || !this.novoEvento.dataHora) {
-        this.mostrarToast('Por favor, preencha o Título e a Data/Hora do evento antes de publicar!', 'aviso');
+        this.toastService.info('Por favor, preencha o Título e a Data/Hora do evento antes de publicar!');
         return;
       }
       novaPostagem.eventoProposto = this.novoEvento;
@@ -148,7 +153,7 @@ export class Feed implements OnInit {
         
         this.carregarFeed();
       },
-      error: (err) => this.mostrarToast('Erro ao publicar postagem. Verifique se todos os campos estão corretos.', 'erro')
+      error: (err) => this.toastService.error('Erro ao publicar postagem. Verifique se todos os campos estão corretos.')
     });
   }
 
@@ -213,7 +218,7 @@ formatarNome(nomeCompleto: string): string {
         post.quantidadeComentarios++;
         this.carregarComentarios(post);
       },
-      error: (err) => this.mostrarToast('Erro ao enviar o comentário.', 'erro')
+      error: (err) => this.toastService.error('Erro ao enviar o comentário.')
     });
   }
 
@@ -223,23 +228,11 @@ formatarNome(nomeCompleto: string): string {
     this.http.post(`${this.apiUrl}/feed/${post.id}/salvar-agenda`, {}).subscribe({
       next: () => {
         post.eventoSalvoPorMim = true;
-        this.mostrarToast('Evento salvo na sua agenda com sucesso!', 'sucesso');
+        this.toastService.success('Evento salvo na sua agenda com sucesso!');
         this.carregarLembretes();
       },
-      error: () => this.mostrarToast('Este evento já está na sua agenda ou ocorreu um erro.', 'aviso')
+      error: () => this.toastService.info('Este evento já está na sua agenda ou ocorreu um erro.')
     });
-  }
-
-  mostrarToast(mensagem: string, tipo: 'sucesso' | 'erro' | 'aviso' = 'sucesso') {
-    this.toast = { mensagem, tipo };
-    
-    // Faz o toast desaparecer automaticamente após 3.5 segundos
-    setTimeout(() => {
-      this.toast = null;
-      this.cdr.detectChanges();
-    }, 3500);
-    
-    this.cdr.detectChanges();
   }
 
   toggleMenu(post: any) {
@@ -249,10 +242,10 @@ formatarNome(nomeCompleto: string): string {
   copiarLink(post: any) {
     const url = `${window.location.origin}/feed?post=${post.id}`;
     navigator.clipboard.writeText(url).then(() => {
-      this.mostrarToast('Link copiado para a área de transferência!', 'sucesso');
+      this.toastService.success('Link copiado para a área de transferência!');
       post.mostrarMenu = false;
     }).catch(() => {
-      this.mostrarToast('Erro ao copiar o link.', 'erro');
+      this.toastService.error('Erro ao copiar o link.');
     });
   }
 
@@ -260,10 +253,10 @@ formatarNome(nomeCompleto: string): string {
     if (confirm('Tem certeza de que deseja excluir esta postagem? Essa ação não pode ser desfeita.')) {
       this.http.delete(`${this.apiUrl}/feed/${post.id}`).subscribe({
         next: () => {
-          this.mostrarToast('Postagem excluída com sucesso.', 'sucesso');
+          this.toastService.success('Postagem excluída com sucesso.');
           this.carregarFeed();
         },
-        error: () => this.mostrarToast('Erro ao excluir a postagem.', 'erro')
+        error: () => this.toastService.error('Erro ao excluir a postagem.')
       });
     }
   }

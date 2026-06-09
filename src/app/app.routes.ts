@@ -9,6 +9,8 @@ import { Feed } from './pages/feed/feed';
 import { Perfil } from './pages/perfil/perfil';
 import { Agenda } from './pages/agenda/agenda';
 import { AuthCallback } from './pages/auth-callback/auth-callback';
+import { Configuracoes } from './pages/configuracoes/configuracoes';
+import { Conversas } from './pages/conversas/conversas';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -19,7 +21,6 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPassword },
   { path: 'auth-callback', component: AuthCallback },
 
-
   { 
     path: '', 
     component: MainLayout,
@@ -27,6 +28,8 @@ export const routes: Routes = [
       { path: 'feed', component: Feed },
       { path: 'agenda', component: Agenda },
       { path: 'perfil', component: Perfil },
+      { path: 'configuracoes', component: Configuracoes },
+      { path: 'conversas', component: Conversas },
     ]
   }
 ];

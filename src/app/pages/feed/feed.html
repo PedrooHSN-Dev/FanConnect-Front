@@ -68,7 +68,7 @@
       
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-          <img [src]="gerarAvatar(post.autor?.nome)" class="w-12 h-12 rounded-full border border-gray-200">
+          <img [src]="gerarAvatar(post.autor?.nome)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
           <div>
             <div class="flex items-center gap-1">
               <h3 class="font-bold text-gray-900">{{ formatarNome(post.autor?.nome) || 'Usuário Desconhecido' }}</h3>
@@ -77,7 +77,28 @@
             <p class="text-xs text-gray-500">{{ formatarData(post.dataCriacao) }}</p>
           </div>
         </div>
-        <button class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></button>
+
+        <div class="relative">
+          <button (click)="toggleMenu(post)" class="text-gray-400 hover:text-gray-600 outline-none p-1.5 rounded-full hover:bg-gray-50 transition-colors relative z-10">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </button>
+          
+          <div *ngIf="post.mostrarMenu" (click)="post.mostrarMenu = false" class="fixed inset-0 z-20 cursor-default"></div>
+          
+          <div *ngIf="post.mostrarMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-30 animate-fade-in">
+            
+            <button (click)="copiarLink(post)" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              Copiar link
+            </button>
+            
+            <hr *ngIf="post.autor?.nome === nomeUsuarioLogado" class="my-1 border-gray-100">
+            
+            <button *ngIf="post.autor?.nome === nomeUsuarioLogado" (click)="excluirPost(post)" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">
+              Excluir publicação
+            </button>
+            
+          </div>
+        </div>
       </div>
 
       <p class="text-gray-800 text-base mb-4 whitespace-pre-wrap">{{ post.conteudo }}</p>

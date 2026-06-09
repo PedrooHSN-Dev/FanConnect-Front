@@ -241,4 +241,30 @@ formatarNome(nomeCompleto: string): string {
     
     this.cdr.detectChanges();
   }
+
+  toggleMenu(post: any) {
+    post.mostrarMenu = !post.mostrarMenu;
+  }
+
+  copiarLink(post: any) {
+    const url = `${window.location.origin}/feed?post=${post.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.mostrarToast('Link copiado para a área de transferência!', 'sucesso');
+      post.mostrarMenu = false;
+    }).catch(() => {
+      this.mostrarToast('Erro ao copiar o link.', 'erro');
+    });
+  }
+
+  excluirPost(post: any) {
+    if (confirm('Tem certeza de que deseja excluir esta postagem? Essa ação não pode ser desfeita.')) {
+      this.http.delete(`${this.apiUrl}/feed/${post.id}`).subscribe({
+        next: () => {
+          this.mostrarToast('Postagem excluída com sucesso.', 'sucesso');
+          this.carregarFeed();
+        },
+        error: () => this.mostrarToast('Erro ao excluir a postagem.', 'erro')
+      });
+    }
+  }
 }

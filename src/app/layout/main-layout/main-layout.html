@@ -51,20 +51,40 @@
       </div>
 
       <div class="flex items-center gap-6">
-        <button class="text-[#ff7315] hover:text-[#e0610d] transition-colors relative">
-          <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        
+        <button class="relative p-2.5 text-gray-400 hover:text-[#2861d6] hover:bg-gray-50 rounded-full transition-all duration-200 outline-none" title="Mensagens">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          
+          <span *ngIf="temNotificacaoMensagem" class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+          </span>
         </button>
 
-        <button class="text-[#ff7315] hover:text-[#e0610d] transition-colors relative">
-          <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <button class="relative p-2.5 text-gray-400 hover:text-red-500 hover:bg-gray-50 rounded-full transition-all duration-200 outline-none" title="Curtidas">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+          
+          <span *ngIf="temNotificacaoCurtida" class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+          </span>
         </button>
 
         <div class="h-8 w-px bg-gray-200 mx-2"></div>
 
         <div class="flex items-center gap-3 bg-gray-50/50 py-1.5 pl-4 pr-1.5 rounded-full border border-gray-100">
           <span class="font-bold text-gray-800 text-sm">{{ formatarNome(nomeUsuarioLogado) }}</span>
-          <img [src]="gerarAvatar(nomeUsuarioLogado)" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+          
+          <img *ngIf="fotoPerfil; else fallbackAvatar" [src]="fotoPerfil" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+          <ng-template #fallbackAvatar>
+            <img [src]="gerarAvatar(nomeUsuarioLogado)" alt="Avatar Fallback" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+          </ng-template>
         </div>
+
       </div>
     </header>
 

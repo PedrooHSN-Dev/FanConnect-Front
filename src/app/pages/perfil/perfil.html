@@ -8,10 +8,18 @@
 
     <div class="px-8 pb-8">
       <div class="flex justify-between items-end -mt-16 mb-4 relative z-10">
-        <div class="p-1 bg-white rounded-full">
-          <img [src]="gerarAvatar(perfil.nome)" class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md">
-        </div>
         
+        <div class="relative group p-1 bg-white rounded-full inline-block">
+          <img *ngIf="perfil.fotoPerfil; else avatarPadrao" [src]="perfil.fotoPerfil" class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md">
+          <ng-template #avatarPadrao>
+            <img [src]="gerarAvatar(perfil.nome)" class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md">
+          </ng-template>
+
+          <div *ngIf="editando" (click)="fileInput.click()" class="absolute inset-1 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-colors hover:bg-black/60 shadow-md">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <input type="file" #fileInput (change)="fazerUploadFoto($event)" accept="image/*" class="hidden">
+        </div>
         <div class="mb-4">
           <button *ngIf="!editando" (click)="editando = true" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-full transition-colors flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -30,7 +38,9 @@
       </div>
 
       <div>
-        <h1 class="text-3xl font-extrabold text-gray-900">{{ perfil.nome || 'Carregando...' }}</h1>
+        <h1 *ngIf="!editando" class="text-3xl font-extrabold text-gray-900">{{ perfil.nome || 'Carregando...' }}</h1>
+        <input *ngIf="editando" type="text" [(ngModel)]="perfil.nome" placeholder="Seu nome" class="text-3xl font-extrabold text-gray-900 bg-gray-50 border-b-2 border-[#2861d6] outline-none w-full md:w-1/2 px-2 py-1 rounded-t-md">
+        
         <p class="text-gray-500 font-medium text-sm mt-1">
           <span class="text-gray-800 font-bold">{{ perfil.quantidadeSeguidores || 0 }}</span> Seguidores 
           <span class="mx-2">•</span> 

@@ -42,10 +42,9 @@ export class Conversas implements OnInit, OnDestroy {
     
     this.http.get<any>(`${this.apiUrl}/usuarios/me`).subscribe(res => {
       this.usuarioLogadoId = res.id;
+      this.conectarWebSocket();
     });
-
     this.carregarMinhasConversas();
-    this.conectarWebSocket();
   }
 
   ngOnDestroy() {
@@ -71,6 +70,14 @@ export class Conversas implements OnInit, OnDestroy {
 
     const outroParticipante = conversa.participantes?.find((p: any) => p.nome !== this.nomeUsuarioLogado);
     return outroParticipante ? outroParticipante.nome : 'Usuário Desconhecido';
+  }
+
+  getFotoConversa(conv: any): string | null {
+    if (conv.tipo === 'GRUPO') {
+      return conv.fotoPerfil || null;
+    }
+    const contato = conv.participantes?.find((p: any) => p.id !== this.usuarioLogadoId);
+    return contato?.fotoPerfil || null;
   }
 
   buscarUsuarios() {
@@ -165,6 +172,12 @@ export class Conversas implements OnInit, OnDestroy {
     this.stompClient.onConnect = () => {
       console.log('Conectado ao WebSocket!');
       if (this.conversaAtiva) this.inscreverNaConversa(this.conversaAtiva.id);
+
+      if (this.usuarioLogadoId) {
+        this.stompClient?.subscribe(`/topic/usuarios/${this.usuarioLogadoId}/notificacoes`, (alerta) => {
+          this.carregarMinhasConversas();
+        });
+      }
     };
 
     this.stompClient.activate();

@@ -18,6 +18,8 @@ export class Feed implements OnInit {
   lembretes: any[] = [];
   novoConteudo = '';
   nomeUsuarioLogado: string = localStorage.getItem('nomeUsuario') || 'Carregando...';
+  fotoPerfilLogado: string | null = localStorage.getItem('fotoPerfil');
+  
   novoComentario: { [key: number]: string } = {};
   novoAnexoUrl: string | null = null;
   mostrandoFormEvento: boolean = false;
@@ -64,7 +66,8 @@ export class Feed implements OnInit {
   toggleFormEvento() {
     this.mostrandoFormEvento = !this.mostrandoFormEvento;
     if (!this.mostrandoFormEvento) {
-      this.novoEvento = { titulo: '', descricao: 'Evento proposto pela comunidade.', dataHora: '', localizacao: '', categoria: 'ESTUDOS', visibilidade: 'GLOBAL' };    }
+      this.novoEvento = { titulo: '', descricao: 'Evento proposto pela comunidade.', dataHora: '', localizacao: '', categoria: 'ESTUDOS', visibilidade: 'GLOBAL' };
+    }
   }
 
   ngOnInit() {
@@ -84,7 +87,15 @@ export class Feed implements OnInit {
     this.http.get<any>('http://localhost:8080/api/usuarios/me').subscribe({
       next: (res) => {
         this.nomeUsuarioLogado = res.nome;
+        this.fotoPerfilLogado = res.fotoPerfil;
+        
         localStorage.setItem('nomeUsuario', res.nome);
+        if (res.fotoPerfil) {
+          localStorage.setItem('fotoPerfil', res.fotoPerfil);
+        } else {
+          localStorage.removeItem('fotoPerfil');
+        }
+        
         this.cdr.detectChanges();
       },
       error: () => {
@@ -166,7 +177,7 @@ export class Feed implements OnInit {
     });
   }
 
-formatarNome(nomeCompleto: string): string {
+  formatarNome(nomeCompleto: string): string {
     if (!nomeCompleto || nomeCompleto === 'Carregando...') return '...';
     return nomeCompleto.trim();
   }

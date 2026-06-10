@@ -4,7 +4,10 @@
     
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
       <div class="flex gap-4">
-        <img [src]="gerarAvatar(nomeUsuarioLogado)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+        <img *ngIf="fotoPerfilLogado; else avatarCriadorPadrao" [src]="fotoPerfilLogado" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+        <ng-template #avatarCriadorPadrao>
+          <img [src]="gerarAvatar(nomeUsuarioLogado)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+        </ng-template>
         
         <div class="flex-1">
           <span class="font-bold text-gray-800">{{ formatarNome(nomeUsuarioLogado) }}</span>
@@ -64,11 +67,15 @@
       </div>
     </div>
 
-<div *ngFor="let post of postagens" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+    <div *ngFor="let post of postagens" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
       
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-          <img [src]="gerarAvatar(post.autor?.nome)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+          <img *ngIf="post.autor?.fotoPerfil; else avatarPostPadrao" [src]="post.autor?.fotoPerfil" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+          <ng-template #avatarPostPadrao>
+            <img [src]="gerarAvatar(post.autor?.nome)" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+          </ng-template>
+
           <div>
             <div class="flex items-center gap-1">
               <h3 class="font-bold text-gray-900">{{ formatarNome(post.autor?.nome) || 'Usuário Desconhecido' }}</h3>
@@ -86,17 +93,13 @@
           <div *ngIf="post.mostrarMenu" (click)="post.mostrarMenu = false" class="fixed inset-0 z-20 cursor-default"></div>
           
           <div *ngIf="post.mostrarMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-30 animate-fade-in">
-            
             <button (click)="copiarLink(post)" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
               Copiar link
             </button>
-            
             <hr *ngIf="post.autor?.nome === nomeUsuarioLogado" class="my-1 border-gray-100">
-            
             <button *ngIf="post.autor?.nome === nomeUsuarioLogado" (click)="excluirPost(post)" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">
               Excluir publicação
             </button>
-            
           </div>
         </div>
       </div>
@@ -111,11 +114,9 @@
         <button (click)="curtir(post.id)" 
                 class="flex items-center gap-2 font-semibold transition-colors hover:text-[#ff7315]"
                 [ngClass]="post.curtidoPorMim ? 'text-[#ff7315]' : 'text-gray-500'">
-          
           <svg class="w-6 h-6" [attr.fill]="post.curtidoPorMim ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
           </svg>
-          
           {{ post.quantidadeCurtidas }}
         </button>
         
@@ -130,7 +131,6 @@
                 class="ml-auto transition-colors tooltip flex items-center" 
                 [ngClass]="post.eventoSalvoPorMim ? 'text-[#ff7315] cursor-not-allowed' : 'text-gray-400 hover:text-[#ff7315] cursor-pointer'"
                 title="Salvar evento na minha agenda">
-          
           <svg class="w-6 h-6" [attr.fill]="post.eventoSalvoPorMim ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
           </svg>
@@ -140,7 +140,12 @@
       <div *ngIf="post.mostrarComentarios" class="mt-4 pt-4 border-t border-gray-100 animate-fade-in">
         <div class="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2">
           <div *ngFor="let comentario of post.comentarios" class="flex gap-3">
-            <img [src]="gerarAvatar(comentario.autorNome || comentario.nomeAutor || comentario.autor?.nome)" class="w-8 h-8 rounded-full border border-gray-200">
+            
+            <img *ngIf="comentario.autor?.fotoPerfil; else avatarComentarioPadrao" [src]="comentario.autor?.fotoPerfil" class="w-8 h-8 rounded-full border border-gray-200 object-cover">
+            <ng-template #avatarComentarioPadrao>
+              <img [src]="gerarAvatar(comentario.autorNome || comentario.nomeAutor || comentario.autor?.nome)" class="w-8 h-8 rounded-full border border-gray-200">
+            </ng-template>
+
             <div class="bg-gray-50 rounded-2xl rounded-tl-none p-3 flex-1 border border-gray-100">
               <div class="flex items-baseline gap-2 mb-1">
                 <span class="text-xs font-bold text-gray-900">{{ formatarNome(comentario.autorNome || comentario.nomeAutor || comentario.autor?.nome) }}</span>
@@ -200,8 +205,8 @@
         Ver Calendário Completo
       </button>
     </div>
-
   </div>
+
   <div *ngIf="toast" 
       class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl font-bold text-white text-sm animate-fade-in transition-all border"
       [ngClass]="{
@@ -209,13 +214,9 @@
         'bg-red-500 border-red-700': toast.tipo === 'erro',
         'bg-[#ff7315] border-[#d85e0d]': toast.tipo === 'aviso'
       }">
-      
     <svg *ngIf="toast.tipo === 'sucesso'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-    
     <svg *ngIf="toast.tipo === 'erro'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-    
     <svg *ngIf="toast.tipo === 'aviso'" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-
     <span>{{ toast.mensagem }}</span>
   </div>
 

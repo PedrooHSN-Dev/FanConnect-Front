@@ -11,6 +11,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class MainLayout implements OnInit {
   nomeUsuarioLogado: string = localStorage.getItem('nomeUsuario') || 'Carregando...';
+  fotoPerfil: string | null = localStorage.getItem('fotoPerfil');
+  
+  temNotificacaoMensagem = false; 
+  temNotificacaoCurtida = false;
 
   constructor(
     private http: HttpClient, 
@@ -26,7 +30,15 @@ export class MainLayout implements OnInit {
     this.http.get<any>('http://localhost:8080/api/usuarios/me').subscribe({
       next: (res) => {
         this.nomeUsuarioLogado = res.nome;
+        this.fotoPerfil = res.fotoPerfil;
+        
         localStorage.setItem('nomeUsuario', res.nome);
+        if (res.fotoPerfil) {
+          localStorage.setItem('fotoPerfil', res.fotoPerfil);
+        } else {
+          localStorage.removeItem('fotoPerfil');
+        }
+        
         this.cdr.detectChanges(); 
       },
       error: () => {
@@ -38,6 +50,7 @@ export class MainLayout implements OnInit {
   sair() {
     localStorage.removeItem('token');
     localStorage.removeItem('nomeUsuario');
+    localStorage.removeItem('fotoPerfil');
     sessionStorage.clear();
     this.router.navigate(['/login']);
   }

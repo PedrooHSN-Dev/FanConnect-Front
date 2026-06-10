@@ -25,7 +25,10 @@
            class="p-3 flex items-center gap-4 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors"
            [ngClass]="{'bg-blue-50': conversaAtiva?.id === conv.id}">
         
-        <img [src]="gerarAvatar(getNomeConversa(conv))" class="w-12 h-12 rounded-full border border-gray-100">
+        <img *ngIf="getFotoConversa(conv); else avatarListaPadrao" [src]="getFotoConversa(conv)" class="w-12 h-12 rounded-full object-cover border border-gray-100">
+        <ng-template #avatarListaPadrao>
+          <img [src]="gerarAvatar(getNomeConversa(conv))" class="w-12 h-12 rounded-full border border-gray-100">
+        </ng-template>
         
         <div class="flex-1 min-w-0">
           <h4 class="font-bold text-gray-900 text-sm truncate">{{ getNomeConversa(conv) }}</h4>
@@ -46,7 +49,11 @@
     <ng-container *ngIf="conversaAtiva">
       
       <div class="p-5 border-b border-gray-50 flex items-center gap-4 bg-white z-10 shadow-sm">
-        <img [src]="gerarAvatar(getNomeConversa(conversaAtiva))" class="w-11 h-11 rounded-full object-cover border border-gray-100">
+        <img *ngIf="getFotoConversa(conversaAtiva); else avatarTopoPadrao" [src]="getFotoConversa(conversaAtiva)" class="w-11 h-11 rounded-full object-cover border border-gray-100">
+        <ng-template #avatarTopoPadrao>
+          <img [src]="gerarAvatar(getNomeConversa(conversaAtiva))" class="w-11 h-11 rounded-full object-cover border border-gray-100">
+        </ng-template>
+        
         <div>
           <h3 class="font-bold text-gray-900 text-lg">{{ getNomeConversa(conversaAtiva) }}</h3>
           <p class="text-xs text-gray-500 font-medium">{{ conversaAtiva.tipo === 'GRUPO' ? 'Grupo' : 'Contato' }}</p>
@@ -58,7 +65,13 @@
         <div *ngFor="let msg of mensagens" class="flex w-full" [ngClass]="{'justify-end': msg.remetente?.id === usuarioLogadoId, 'justify-start': msg.remetente?.id !== usuarioLogadoId}">
           
           <div class="max-w-[75%] md:max-w-[60%] flex gap-3" [ngClass]="{'flex-row-reverse': msg.remetente?.id === usuarioLogadoId}">
-            <img *ngIf="msg.remetente?.id !== usuarioLogadoId" [src]="gerarAvatar(msg.remetente?.nome)" class="w-8 h-8 rounded-full mt-1 flex-shrink-0">
+            
+            <ng-container *ngIf="msg.remetente?.id !== usuarioLogadoId">
+              <img *ngIf="msg.remetente?.fotoPerfil; else avatarMsgPadrao" [src]="msg.remetente?.fotoPerfil" class="w-8 h-8 rounded-full mt-1 flex-shrink-0 object-cover">
+              <ng-template #avatarMsgPadrao>
+                <img [src]="gerarAvatar(msg.remetente?.nome)" class="w-8 h-8 rounded-full mt-1 flex-shrink-0">
+              </ng-template>
+            </ng-container>
             
             <div class="flex flex-col" [ngClass]="{'items-end': msg.remetente?.id === usuarioLogadoId, 'items-start': msg.remetente?.id !== usuarioLogadoId}">
               <span *ngIf="msg.remetente?.id !== usuarioLogadoId && conversaAtiva?.tipo === 'GRUPO'" class="text-xs font-bold text-gray-500 mb-1 ml-1">{{ msg.remetente?.nome }}</span>

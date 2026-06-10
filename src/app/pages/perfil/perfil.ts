@@ -49,8 +49,27 @@ export class Perfil implements OnInit {
     });
   }
 
+fazerUploadFoto(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('arquivo', file);
+
+      // Usa a sua rota existente de upload
+      this.http.post<any>(`http://localhost:8080/api/upload`, formData).subscribe({
+        next: (res) => {
+          this.perfil.fotoPerfil = res.url; // Atualiza a foto localmente antes de salvar
+          this.cdr.detectChanges();
+        },
+        error: (err) => alert('Erro ao fazer upload da imagem.')
+      });
+    }
+  }
+
   salvarPerfil() {
     const body = {
+      nome: this.perfil.nome,
+      fotoPerfil: this.perfil.fotoPerfil,
       biografia: this.perfil.biografia,
       telefone: this.perfil.telefone,
       localizacao: this.perfil.localizacao,
@@ -60,10 +79,14 @@ export class Perfil implements OnInit {
     };
 
     this.http.put(`${this.apiUrl}/perfil`, body).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.perfil = res;
         this.editando = false;
+        
+        localStorage.setItem('nomeUsuario', res.nome); 
+        
         this.cdr.detectChanges();
+        window.location.reload(); 
       },
       error: (err) => alert('Erro ao salvar o perfil. Verifique os dados.')
     });
